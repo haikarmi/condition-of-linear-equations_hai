@@ -1,89 +1,56 @@
 import numpy as np
+#from Matrix.inverse_matrix import inverse
 from colors import bcolors
-from matrix_utility_fixed import swap_rows_elementary_matrix, row_addition_elementary_matrix
+from matrix_utility_fixed import print_matrix
 
 
-def lu(A):
-    N = len(A)
-    L = np.eye(N)  # Create an identity matrix of size N x N
-
-    for i in range(N):
-
-        # Partial Pivoting: Find the pivot row with the largest absolute value in the current column
-        pivot_row = i
-        v_max = A[pivot_row][i]
-        for j in range(i + 1, N):
-            if abs(A[j][i]) > v_max:
-                v_max = A[j][i]
-                pivot_row = j
-
-        # if a principal diagonal element is zero,it denotes that matrix is singular,
-        # and will lead to a division-by-zero later.
-        if A[i][pivot_row] == 0:
-            raise ValueError("can't perform LU Decomposition")
-
-        # Swap the current row with the pivot row
-        if pivot_row != i:
-            e_matrix = swap_rows_elementary_matrix(N, i, pivot_row)
-            print(f"elementary matrix for swap between row {i} to row {pivot_row} :\n {e_matrix} \n")
-            A = np.dot(e_matrix, A)
-            print(f"The matrix after elementary operation :\n {A}")
-            print(bcolors.OKGREEN, "---------------------------------------------------------------------------",
-                  bcolors.ENDC)
-
-        for j in range(i + 1, N):
-            #  Compute the multiplier
-            m = -A[j][i] / A[i][i]
-            e_matrix = row_addition_elementary_matrix(N, j, i, m)
-            e_inverse = np.linalg.inv(e_matrix)
-            L = np.dot(L, e_inverse)
-            A = np.dot(e_matrix, A)
-            print(f"elementary matrix to zero the element in row {j} below the pivot in column {i} :\n {e_matrix} \n")
-            print(f"The matrix after elementary operation :\n {A}")
-            print(bcolors.OKGREEN, "---------------------------------------------------------------------------",
-                  bcolors.ENDC)
-
-    U = A
-    return L, U
+def norm(mat):
+    size = len(mat)
+    max_row = 0
+    for row in range(size):
+        sum_row = 0
+        for col in range(size):
+            sum_row += abs(mat[row][col])
+        if sum_row > max_row:
+            max_row = sum_row
+    return max_row
 
 
-# function to calculate the values of the unknowns
-def backward_substitution(mat):
-    N = len(mat)
-    x = np.zeros(N)  # An array to store solution
+def condition_number(A):
+    # Step 1: Calculate the max norm (infinity norm) of A
+    norm_A = norm(A)
 
-    # Start calculating from last equation up to the first
-    for i in range(N - 1, -1, -1):
+    # Step 2: Calculate the inverse of A
+    #A_inv = inverse(A)
+    A_inv = np.linalg.inv(A)
 
-        x[i] = mat[i][N]
+    # Step 3: Calculate the max norm of the inverse of A
+    norm_A_inv = norm(A_inv)
 
-        # Initialize j to i+1 since matrix is upper triangular
-        for j in range(i + 1, N):
-            x[i] -= mat[i][j] * x[j]
+    # Step 4: Compute the condition number
+    cond = norm_A * norm_A_inv
 
-        x[i] = (x[i] / mat[i][i])
+    print(bcolors.OKBLUE, "A:", bcolors.ENDC)
+    print_matrix(A)
 
-    return x
+    print(bcolors.OKBLUE, "inverse of A:", bcolors.ENDC)
+    print_matrix(A_inv)
 
+    print(bcolors.OKBLUE, "Max Norm of A:", bcolors.ENDC, norm_A, "\n")
 
-def lu_solve(A_b):
-    L, U = lu(A_b)
-    print("Lower triangular matrix L:\n", L)
-    print("Upper triangular matrix U:\n", U)
+    print(bcolors.OKBLUE, "max norm of the inverse of A:", bcolors.ENDC, norm_A_inv)
 
-    result = backward_substitution(U)
-    print(bcolors.OKBLUE, "\nSolution for the system:")
-    for x in result:
-        print("{:.6f}".format(x))
+    #print_matrix(np.dot(A_inv,A))
+
+    return cond
 
 
 if __name__ == '__main__':
-    A_b = [[1, -1, 2, -1, -8],
-           [2, -2, 3, -3, -20],
-           [1, 1, 1, 0, -2],
-           [1, -1, 4, 3, 4]]
+    A = np.array([[0,1,2],[1,2,4],[0,0,1]])
+    cond = condition_number(A)
 
-    lu_solve(A_b)
+    print(bcolors.OKGREEN, "\n condition number: ", cond, bcolors.ENDC)
 
-print(
-        "the git link:https://github.com/haikarmi/condition-of-linear-equations_hai.git\ngroup:Almog Babila, Hai karmi, Yagel Batito, Meril Hasid\nstudent:hai karmi  207265687")
+    print("condition number according numpi: ",np.linalg.cond(A,np.inf))
+
+    print("the git link: https://github.com/Babilabong/condition-of-linear-equations-\ngroup:Almog Babila, Hay Carmi, Yagel Batito, Meril Hasid\nstudent:Almog Babila 209477678")
