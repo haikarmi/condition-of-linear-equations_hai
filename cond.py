@@ -46,11 +46,15 @@ def condition_number(A):
 
 
 if __name__ == '__main__':
-    A = np.array([[0,1,2],[1,2,4],[0,0,1]])
+    print("the git link:https://github.com/haikarmi/condition-of-linear-equations_hai.git\n group:Almog Babila-209477678, Hai karmi-207265687, Yagel Batito-318271863, Meril Hasid-324569714\n date :19/02/24 \n student: hai karmi id: 207265687")
+
+    A = np.array([[0,1,2],
+                  [1,2,4],
+                  [0,0,1]])
     cond = condition_number(A)
 
     print(bcolors.OKGREEN, "\n condition number: ", cond, bcolors.ENDC)
 
     print("condition number according numpi: ",np.linalg.cond(A,np.inf))
 
-    print("the git link:https://github.com/haikarmi/condition-of-linear-equations_hai.git\ngroup:Almog Babila, Hai karmi, Yagel Batito, Meril Hasid\nstudent:hai karmi 207265687")
+
